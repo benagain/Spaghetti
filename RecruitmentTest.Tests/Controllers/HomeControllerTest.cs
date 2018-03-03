@@ -29,7 +29,7 @@ namespace RecruitmentTest.Tests.Controllers
             ViewResult result = controller.About() as ViewResult;
 
             // Assert
-            Assert.Equal("Your application description page.", result.ViewBag.Message);
+            Assert.Equal("Davey P's Italian Restauranty was established in 2016 to produce Spaghetti Code.", result.ViewBag.Message);
         }
 
         [Fact]
