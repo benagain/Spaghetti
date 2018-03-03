@@ -13,7 +13,7 @@ namespace RecruitmentTest
 
         private DbSet<MenuItem> _MenuItems { get; set; }
 
-        public IReadOnlyList<MenuItem> MenuItems => _MenuItems.ToList();
+        public IQueryable<MenuItem> MenuItems => _MenuItems;
 
         public DbSet<MenuItemType> MenuItemTypes { get; set; }
 

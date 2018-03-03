@@ -29,11 +29,13 @@ namespace RecruitmentTest.Features
         public class Handler
         {
             private readonly RestaurantDbContext context;
+            private readonly PaymentProviderFactory paymentProviders;
             private readonly PaymentGateway paymentGateway;
 
-            public Handler(RestaurantDbContext context, PaymentGateway paymentGateway)
+            public Handler(RestaurantDbContext context, PaymentProviderFactory paymentProviders, PaymentGateway paymentGateway)
             {
                 this.context = context;
+                this.paymentProviders = paymentProviders;
                 this.paymentGateway = paymentGateway;
             }
 
@@ -43,43 +45,23 @@ namespace RecruitmentTest.Features
 
                 var price = items.Sum(x => x.Price);
 
-                bool paid = TakePayment(order, price);
+                bool paidOk = TakePayment(order, price);
 
-                return paid 
+                return paidOk 
                     ? Result.Success(items.ToArray())
                     : Result.Failed();
             }
 
-            private IEnumerable<MenuItem> FindOrderedItems(OrderCommand order)
-                => order.MenuItemId.Join(
-                    context.MenuItems,
-                    id => id,
-                    item => item.Id,
-                    (_, item) => item);
+            private IEnumerable<MenuItem> FindOrderedItems(OrderCommand order) 
+                => context.MenuItems.Where(x => order.MenuItemId.Contains(x.Id));
 
             private bool TakePayment(OrderCommand order, decimal price)
             {
-                PaymentProvider paymentProvider = null;
+                var paymentProvider = paymentProviders.Create(order.PaymentTypeId);
+                
+                if (paymentProvider == null) return false;
 
-                switch (order.PaymentTypeId)
-                {
-                    case 1:
-                        paymentProvider = new DebitCard("0123 4567 8910 1112");
-                        break;
-
-                    case 2:
-                        paymentProvider = new CreditCard("9999 9999 9999 9999");
-                        break;
-                }
-
-                bool paid = false;
-                if (paymentProvider != null)
-                {
-                    paid = paymentGateway.Pay(paymentProvider, 1234, price);
-
-                }
-
-                return paid;
+                return paymentGateway.Pay(paymentProvider, 1234, price);
             }
         }
     }
