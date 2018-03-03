@@ -22,5 +22,10 @@ namespace RecruitmentTest
         private List<MenuItem> _Items { get; set; } = new List<MenuItem>();
 
         public IReadOnlyList<MenuItem> Items => _Items;
+
+        internal void AddItems(params MenuItem[] item)
+        {
+            _Items.AddRange(item);
+        }
     }
 }

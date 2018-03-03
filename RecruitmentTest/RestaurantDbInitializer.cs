@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -34,35 +33,60 @@ namespace RecruitmentTest
 
         public static async Task<RestaurantDbContext> EnsureSeededAsync(this RestaurantDbContext context)
         {
-            //var starter = new MenuItemType { Description = "Starter" };
-            //var main = new MenuItemType { Description = "Main" };
-            //var desert = new MenuItemType { Description = "Desert" };
+            var menu = new[]
+            {
+                new MenuItemType(
+                "Starter",
+                new[]
+                {
+                    new MenuItem { Name = "Arancini", Price = 2.29m },
+                    new MenuItem { Name = "Fonduta Formaggi", Price = 3.79m },
+                    new MenuItem { Name = "Bruschetta", Price = 3.29m },
+                    new MenuItem { Name = "Mixed Olives", Price = 2.75m },
+                    new MenuItem { Name = "N'Duja Pizzette", Price = 3.10m },
+                }),
 
-            //var unseededMenuItemTypes =
-            //    new[] { starter, main, desert }
-            //    .Except(context.MenuItemTypes);
+                new MenuItemType(
+                "Main",
+                new[]
+                {
+                    new MenuItem { Name = "Spaghetti Bolognese", Price = 6.75m },
+                    new MenuItem { Name = "Cheeseburger", Price = 6.99m },
+                    new MenuItem { Name = "Lasagne", Price = 5.99m },
+                    new MenuItem { Name = "Lobster and Crab Tortelli", Price = 14.99m },
+                }),
 
-            //await context.AddRangeAsync(unseededMenuItemTypes);
-            //await context.SaveChangesAsync();
+                new MenuItemType(
+                "Desert",
+                new[]
+                {
+                    new MenuItem { Name = "Tiramisu", Price = 4.50m },
+                    new MenuItem { Name = "Plum Tart", Price = 3.50m },
+                    new MenuItem { Name = "Sorbet", Price = 1.99m }
+                })
+            };
 
-            //var menuItems = new List<MenuItem>
-            //{
-            //    new MenuItem { MenuItemTypeId = starter.Id, Name = "Arancini", Price = 2.29m },
-            //    new MenuItem { MenuItemTypeId = starter.Id, Name = "Fonduta Formaggi", Price = 3.79m },
-            //    new MenuItem { MenuItemTypeId = starter.Id, Name = "Bruschetta", Price = 3.29m },
-            //    new MenuItem { MenuItemTypeId = starter.Id, Name = "Mixed Olives", Price = 2.75m },
-            //    new MenuItem { MenuItemTypeId = starter.Id, Name = "N'Duja Pizzette", Price = 3.10m },
-            //    new MenuItem { MenuItemTypeId = main.Id, Name = "Spaghetti Bolognese", Price = 6.75m },
-            //    new MenuItem { MenuItemTypeId = main.Id, Name = "Cheeseburger", Price = 6.99m },
-            //    new MenuItem { MenuItemTypeId = main.Id, Name = "Lasagne", Price = 5.99m },
-            //    new MenuItem { MenuItemTypeId = main.Id, Name = "Lobster and Crab Tortelli", Price = 14.99m },
-            //    new MenuItem { MenuItemTypeId = desert.Id, Name = "Tiramisu", Price = 4.50m },
-            //    new MenuItem { MenuItemTypeId = desert.Id, Name = "Plum Tart", Price = 3.50m },
-            //    new MenuItem { MenuItemTypeId = desert.Id, Name = "Sorbet", Price = 1.99m }
-            //};
+            foreach (var itemType in menu)
+            {
+                // needs AddOrUpdate
+                var existing = context
+                    .MenuItemTypes
+                    .Include(nameof(MenuItemType.Items))
+                    .FirstOrDefault(x => x.Description == itemType.Description);
 
-            //var unseededMenuItems = menuItems.Except(context.MenuItems);
-            //await context.AddRangeAsync(unseededMenuItems);
+                if (existing == null)
+                {
+                    await context.MenuItemTypes.AddAsync(itemType);
+                }
+                else
+                {
+                    var missingDishes =
+                        itemType.Items.Except(existing.Items, new MenuItemNameComparer())
+                        .ToArray();
+
+                    existing.AddItems(missingDishes);
+                }
+            }
 
             await context.SaveChangesAsync();
 
