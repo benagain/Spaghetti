@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using RecruitmentTest.Controllers;
 using RecruitmentTest.Tests.AutoFixture;
 using Xunit;
@@ -35,6 +36,21 @@ namespace RecruitmentTest.Tests.Controllers
 
             // Assert
             Assert.NotNull(result);
+        }
+
+        [Theory, DomainAutoData]
+        public void Pay_with_debit_card_redirects_to_PaymentOk(HomeController sut)
+        {
+            // Given
+            const int debitCardPayment = 1;
+
+            // When
+            var result = sut.Update(0, debitCardPayment);
+
+            // Then
+            result
+                .Should().BeAssignableTo<RedirectToActionResult>()
+                .Which.ActionName.Should().Be(nameof(HomeController.PaymentOk));
         }
     }
 }
