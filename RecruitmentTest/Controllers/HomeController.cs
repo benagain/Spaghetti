@@ -1,61 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
-using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using RecruitmentTest.Models;
 
 namespace RecruitmentTest.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public IActionResult Index()
         {
-            List<MenuItem> menuItems;
+            List<MenuItem> menuItems = new List<MenuItem>();
 
-            using (var context = new RestaurantDbContext())
-            {
-                menuItems = context.MenuItems.ToList();
-            }
+            //using (var context = new RestaurantDbContext())
+            //{
+            //    menuItems = context.MenuItems.ToList();
+            //}
 
             return View(menuItems);
         }
 
-        public ActionResult About()
+        public IActionResult About()
         {
-            ViewBag.Message = "Davey P's Italian Restauranty was established in 2016 to produce Spaghetti Code.";
+            ViewData["Message"] = "Davey P's Italian Restauranty was established in 2016 to produce Spaghetti Code.";
 
             return View();
         }
 
-        public ActionResult Contact()
+        public IActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewData["Message"] = "Your contact page.";
 
             return View();
         }
 
         public ActionResult PaymentOk()
         {
-            ViewBag.Message = "Thank you. Your order has been placed.";
+            ViewData["Message"] = "Thank you. Your order has been placed.";
 
             return View();
         }
 
         public ActionResult PaymentFailed()
         {
-            ViewBag.Message = "Sorry, your payment failed.";
+            ViewData["Message"] = "Sorry, your payment failed.";
 
             return View();
         }
 
-        public ActionResult Update(int menuItemId, int paymentTypeId) 
+        public ActionResult Update(int menuItemId, int paymentTypeId)
         {
             var paid = false;
 
             var paymentGateway = new PaymentGateway();
 
-            switch(paymentTypeId)
+            switch (paymentTypeId)
             {
                 case 1:
                     var dc = new DebitCard("0123 4567 8910 1112");
@@ -69,6 +67,11 @@ namespace RecruitmentTest.Controllers
             }
 
             return RedirectToAction("PaymentFailed");
+        }
+
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

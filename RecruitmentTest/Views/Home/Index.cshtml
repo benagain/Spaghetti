@@ -11,7 +11,7 @@
 </div>
 
 <div class="row">
-    @using(Html.BeginForm("Update", "Home", FormMethod.Post))
+    @using (Html.BeginForm("Update", "Home", FormMethod.Post))
     {
         <div class="col-md-4">
             <h2>Menu</h2>
@@ -26,7 +26,7 @@
                 <li>Debit card <input type="radio" name="paymentTypeId" value="1" /></li>
                 <li>Credit card <input type="radio" name="paymentTypeId" value="2" /></li>
             </ul>
-            <input type="submit" value="Order"/>
+            <input type="submit" value="Order" />
         </div>
     }
 </div>
