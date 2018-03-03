@@ -1,6 +1,6 @@
 ﻿namespace RecruitmentTest
 {
-    public class CreditCard
+    public class CreditCard : PaymentProvider
     {
         public CreditCard(string cardNumber)
         {

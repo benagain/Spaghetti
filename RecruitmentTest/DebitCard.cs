@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RecruitmentTest
+﻿namespace RecruitmentTest
 {
-    public class DebitCard
+    public class DebitCard : PaymentProvider
     {
         public DebitCard(string cardNumber)
         {

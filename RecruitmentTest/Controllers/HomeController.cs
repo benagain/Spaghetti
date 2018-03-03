@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentTest.Models;
 
@@ -51,26 +53,26 @@ namespace RecruitmentTest.Controllers
 
         public ActionResult Update(int menuItemId, int paymentTypeId)
         {
-            var paid = false;
+            PaymentProvider paymentProvider = null;
 
             var paymentGateway = new PaymentGateway();
 
             switch (paymentTypeId)
             {
                 case 1:
-                    var dc = new DebitCard("0123 4567 8910 1112");
-                    paid = paymentGateway.Pay(dc, 1234, 1.0m);
+                    paymentProvider = new DebitCard("0123 4567 8910 1112");
                     break;
 
                 case 2:
-                    var cc = new CreditCard("9999 9999 9999 9999");
-                    paid = paymentGateway.Pay(cc, 1234, 1.0m);
+                    paymentProvider = new CreditCard("9999 9999 9999 9999");
                     break;
             }
 
-            if (paid)
+            if (paymentProvider != null)
             {
-                return RedirectToAction("PaymentOk");
+                var paid = paymentGateway.Pay(paymentProvider, 1234, 1.0m);
+
+                if (paid) return RedirectToAction("PaymentOk");
             }
 
             return RedirectToAction("PaymentFailed");
