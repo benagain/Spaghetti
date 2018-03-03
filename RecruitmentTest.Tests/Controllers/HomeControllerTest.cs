@@ -59,24 +59,7 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public async Task Pay_with_debit_card_redirects_to_PaymentOk(HomeController sut, RestaurantDbContext setupDb)
-        {
-            // Given
-            const int debitCardPayment = 1;
-            await setupDb.EnsureSeededAsync();
-            var orderItem = setupDb.MenuItems.First();
-
-            // When
-            var result = sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = debitCardPayment });
-
-            // Then
-            result
-                .Should().BeAssignableTo<RedirectToActionResult>()
-                .Which.ActionName.Should().Be(nameof(HomeController.PaymentOk));
-        }
-
-        [Theory, DomainAutoData]
-        public async Task Pay_with_credit_card_redirects_to_PaymentOk(HomeController sut, RestaurantDbContext setupDb)
+        public async Task Ordering_successfully_shows_item_ordered_in_view(HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             const int creditCardPayment = 2;
@@ -84,12 +67,12 @@ namespace RecruitmentTest.Tests.Controllers
             var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = creditCardPayment });
+            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = creditCardPayment });
 
             // Then
             result
-                .Should().BeAssignableTo<RedirectToActionResult>()
-                .Which.ActionName.Should().Be(nameof(HomeController.PaymentOk));
+                .Should().BeAssignableTo<ViewResult>()
+                .Which.ViewData.Should().Contain("Message", "Thank you. Your order has been placed.");
         }
 
         [Theory, DomainAutoData]
@@ -101,7 +84,7 @@ namespace RecruitmentTest.Tests.Controllers
             var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = creditCardPayment });
+            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = creditCardPayment });
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<CreditCard>(), Arg.Any<int>(), Arg.Any<decimal>());
@@ -115,7 +98,7 @@ namespace RecruitmentTest.Tests.Controllers
             var orderItem = context.MenuItems.First();
 
             // When
-            sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = 1 });
+            sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = 1 });
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<PaymentProvider>(), Arg.Any<int>(), orderItem.Price);

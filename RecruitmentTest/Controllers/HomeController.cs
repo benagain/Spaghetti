@@ -36,13 +36,6 @@ namespace RecruitmentTest.Controllers
             return View();
         }
 
-        public ActionResult PaymentOk()
-        {
-            ViewData["Message"] = "Thank you. Your order has been placed.";
-
-            return View();
-        }
-
         public ActionResult PaymentFailed()
         {
             ViewData["Message"] = "Sorry, your payment failed.";
@@ -50,15 +43,19 @@ namespace RecruitmentTest.Controllers
             return View();
         }
 
-        public ActionResult Update(Order order)
+        public ActionResult Order(Order order)
         {
             var handler = new Order.CommandHandler(context, paymentGateway);
 
             var result = handler.Handle(order);
 
-            return result
-                ? RedirectToAction("PaymentOk")
-                : RedirectToAction("PaymentFailed");
+            if (result)
+            {
+                ViewData["Message"] = "Thank you. Your order has been placed.";
+                return View(order);
+            }
+
+            return RedirectToAction("PaymentFailed");
         }
 
         public IActionResult Error()
