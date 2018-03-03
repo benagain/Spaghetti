@@ -52,5 +52,20 @@ namespace RecruitmentTest.Tests.Controllers
                 .Should().BeAssignableTo<RedirectToActionResult>()
                 .Which.ActionName.Should().Be(nameof(HomeController.PaymentOk));
         }
+
+        [Theory, DomainAutoData]
+        public void Pay_with_credit_card_redirects_to_PaymentOk(HomeController sut)
+        {
+            // Given
+            const int creditCardPayment = 2;
+
+            // When
+            var result = sut.Update(0, creditCardPayment);
+
+            // Then
+            result
+                .Should().BeAssignableTo<RedirectToActionResult>()
+                .Which.ActionName.Should().Be(nameof(HomeController.PaymentOk));
+        }
     }
 }

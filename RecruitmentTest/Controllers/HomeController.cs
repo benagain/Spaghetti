@@ -61,6 +61,11 @@ namespace RecruitmentTest.Controllers
                     var dc = new DebitCard("0123 4567 8910 1112");
                     paid = paymentGateway.Pay(dc, 1234, 1.0m);
                     break;
+
+                case 2:
+                    var cc = new CreditCard("9999 9999 9999 9999");
+                    paid = paymentGateway.Pay(cc, 1234, 1.0m);
+                    break;
             }
 
             if (paid)

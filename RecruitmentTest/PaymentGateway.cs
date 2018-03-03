@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RecruitmentTest
+﻿namespace RecruitmentTest
 {
     public class PaymentGateway
     {
@@ -12,5 +6,8 @@ namespace RecruitmentTest
         {
             return true;
         }
+
+        internal bool Pay(CreditCard cc, int v1, decimal v2)
+            => true;
     }
 }
