@@ -25,7 +25,7 @@ namespace RecruitmentTest
                 }
                 catch (Exception ex)
                 {
-                    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+                    var logger = serviceProvider.GetRequiredService<ILogger<RestaurantDbContext>>();
                     logger.LogError(ex, "An error occurred seeding the DB.");
                 }
             }
