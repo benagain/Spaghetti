@@ -7,7 +7,7 @@
 <div class="jumbotron">
     <h1>Davey P's Italian Restaurant</h1>
     <p class="lead">Thank you for your order.</p>
-    <p>You ordered @Model.Ordered.Name</p>
+    <p>You ordered @String.Join(", ", Model.Ordered.Select(x => x.Name)).</p>
     <p>Still hungry?  Order more from @Html.ActionLink("the menu", "Index", "Home").</p>
 </div>
 

@@ -22,7 +22,7 @@
             <ul>
             @foreach (var menuItem in course.Items)
             {
-                <li>@menuItem.Name : £ @menuItem.Price <input type="radio" name="menuItemId" value="@menuItem.Id" /></li>
+                <li>@menuItem.Name : £ @menuItem.Price <input type="checkbox" name="menuItemId" value="@menuItem.Id" /></li>
             }
             </ul>
         }

@@ -1,11 +1,12 @@
 ﻿using RecruitmentTest.Features;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RecruitmentTest.Tests.Helpers
 {
     public class OrderBuilder
     {
         private List<MenuItem> MenuItems = new List<MenuItem>();
-
         private int PaymentTypeId;
 
         public OrderBuilder(MenuItem item)
@@ -14,11 +15,17 @@ namespace RecruitmentTest.Tests.Helpers
             WithDebitCard();
         }
 
+        public OrderBuilder(IEnumerable<MenuItem> items)
+        {
+            foreach (var item in items)
+                WithItem(item);
 
+            WithDebitCard();
+        }
 
         public OrderBuilder WithItem(MenuItem item)
         {
-            this.MenuItemId = item.Id;
+            this.MenuItems.Add(item);
             return this;
         }
 
@@ -37,7 +44,7 @@ namespace RecruitmentTest.Tests.Helpers
         internal Order Build() 
             => new Order
             {
-                MenuItemId = MenuItemId,
+                MenuItemId = MenuItems.Select(x => x.Id).ToArray(),
                 PaymentTypeId = PaymentTypeId,
             };
     }

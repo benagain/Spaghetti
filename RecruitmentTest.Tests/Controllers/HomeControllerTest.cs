@@ -122,7 +122,7 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public async Task Ordering_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext context)
+        public async Task Ordering_one_item_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext context)
         {
             // Given
             await context.EnsureSeededAsync();
@@ -133,6 +133,21 @@ namespace RecruitmentTest.Tests.Controllers
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<PaymentProvider>(), Arg.Any<int>(), orderItem.Price);
+        }
+
+        [Theory, DomainAutoData]
+        public async Task Ordering_multiple_items_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext context)
+        {
+            // Given
+            await context.EnsureSeededAsync();
+            var orderItems = context.MenuItems.Take(3);
+            var totalPrice = orderItems.Aggregate(0m, (sum, item) => sum + item.Price);
+
+            // When
+            var result = sut.Order(new OrderBuilder(orderItems).Build());
+
+            // Then
+            paymentGateway.Received().Pay(Arg.Any<PaymentProvider>(), Arg.Any<int>(), totalPrice);
         }
     }
 }
