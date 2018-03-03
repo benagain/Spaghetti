@@ -1,4 +1,5 @@
-﻿using AutoFixture.Xunit2;
+﻿using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -18,6 +19,22 @@ namespace RecruitmentTest.Tests.Controllers
 
             // Assert
             Assert.NotNull(result);
+        }
+
+        [Theory, DomainAutoData]
+        public async Task Index_returns_all_menu_items_grouped_by_course(HomeController sut, RestaurantDbContext setupDb, MenuItemType[] courses)
+        {
+            // Given
+            await setupDb.MenuItemTypes.AddRangeAsync(courses);
+            await setupDb.SaveChangesAsync();
+
+            // When
+            var result = sut.Index();
+
+            var model = result
+                .Should().BeAssignableTo<ViewResult>()
+                .Which.Model.Should().BeAssignableTo<Behaviours.Order.Query>()
+                .Which.Courses.Should().BeEquivalentTo(courses);
         }
 
         [Theory, DomainAutoData]
