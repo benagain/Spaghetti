@@ -1,63 +1,37 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using RecruitmentTest.Controllers;
+using RecruitmentTest.Tests.AutoFixture;
 using Xunit;
 
 namespace RecruitmentTest.Tests.Controllers
 {
     public class HomeControllerTest
     {
-        [Fact]
-        public async Task Index()
+        [Theory, DomainAutoData]
+        public void Index(HomeController sut)
         {
-            // Arrange
-            var builder = new DbContextOptionsBuilder<RestaurantDbContext>();
-            builder.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString());
-            var context = new RestaurantDbContext(builder.Options);
-            await context.EnsureSeededAsync();
-
-            HomeController controller = new HomeController(context);
-
             // Act
-            ViewResult result = controller.Index() as ViewResult;
+            var result = sut.Index() as ViewResult;
 
             // Assert
             Assert.NotNull(result);
         }
 
-        [Fact]
-        public async Task About()
+        [Theory, DomainAutoData]
+        public void About(HomeController sut)
         {
-            // Arrange
-            var builder = new DbContextOptionsBuilder<RestaurantDbContext>();
-            builder.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString());
-            var context = new RestaurantDbContext(builder.Options);
-            await context.EnsureSeededAsync();
-
-            HomeController controller = new HomeController(context);
-
             // Act
-            ViewResult result = controller.About() as ViewResult;
+            var result = sut.About() as ViewResult;
 
             // Assert
             Assert.Equal("Davey P's Italian Restauranty was established in 2016 to produce Spaghetti Code.", result.ViewData["Message"]);
         }
 
-        [Fact]
-        public async Task Contact()
+        [Theory, DomainAutoData]
+        public void Contact(HomeController sut)
         {
-            // Arrange
-            var builder = new DbContextOptionsBuilder<RestaurantDbContext>();
-            builder.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString());
-            var context = new RestaurantDbContext(builder.Options);
-            await context.EnsureSeededAsync();
-
-            HomeController controller = new HomeController(context);
-
             // Act
-            ViewResult result = controller.Contact() as ViewResult;
+            var result = sut.Contact() as ViewResult;
 
             // Assert
             Assert.NotNull(result);
