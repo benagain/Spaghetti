@@ -1,9 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace RecruitmentTest.Features
 {
-    public class Order
+    public class OrderCommand
     {
         public int[] MenuItemId { get; set; }
 
@@ -26,27 +26,39 @@ namespace RecruitmentTest.Features
                 => new Result { PaymentOk = false };
         }
 
-        public class CommandHandler
+        public class Handler
         {
             private readonly RestaurantDbContext context;
             private readonly PaymentGateway paymentGateway;
 
-            public CommandHandler(RestaurantDbContext context, PaymentGateway paymentGateway)
+            public Handler(RestaurantDbContext context, PaymentGateway paymentGateway)
             {
                 this.context = context;
                 this.paymentGateway = paymentGateway;
             }
 
-            public Result Handle(Order order)
+            public Result Handle(OrderCommand order)
             {
-                var items = order.MenuItemId.Join(
+                var items = FindOrderedItems(order);
+
+                var price = items.Sum(x => x.Price);
+
+                bool paid = TakePayment(order, price);
+
+                return paid 
+                    ? Result.Success(items.ToArray())
+                    : Result.Failed();
+            }
+
+            private IEnumerable<MenuItem> FindOrderedItems(OrderCommand order)
+                => order.MenuItemId.Join(
                     context.MenuItems,
                     id => id,
                     item => item.Id,
                     (_, item) => item);
 
-                var price = items.Sum(x => x.Price);
-
+            private bool TakePayment(OrderCommand order, decimal price)
+            {
                 PaymentProvider paymentProvider = null;
 
                 switch (order.PaymentTypeId)
@@ -60,14 +72,14 @@ namespace RecruitmentTest.Features
                         break;
                 }
 
+                bool paid = false;
                 if (paymentProvider != null)
                 {
-                    var paid = paymentGateway.Pay(paymentProvider, 1234, price);
+                    paid = paymentGateway.Pay(paymentProvider, 1234, price);
 
-                    if (paid) return Result.Success(items.ToArray());
                 }
 
-                return Result.Failed();
+                return paid;
             }
         }
     }

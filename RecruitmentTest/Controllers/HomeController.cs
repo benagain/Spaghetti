@@ -8,13 +8,12 @@ namespace RecruitmentTest.Controllers
     public class HomeController : Controller
     {
         private readonly RestaurantDbContext context;
-        private readonly PaymentGateway paymentGateway;
 
-        public HomeController(RestaurantDbContext context, PaymentGateway paymentGateway)
+        public HomeController(RestaurantDbContext context)
         {
             this.context = context;
-            this.paymentGateway = paymentGateway;
         }
+
         public IActionResult Index()
         {
             var query = new Menu.QueryHandler(context).Handle();
@@ -43,10 +42,8 @@ namespace RecruitmentTest.Controllers
             return View();
         }
 
-        public ActionResult Order(Order order)
+        public ActionResult Order(OrderCommand order, [FromServices] OrderCommand.Handler handler)
         {
-            var handler = new Order.CommandHandler(context, paymentGateway);
-
             var result = handler.Handle(order);
 
             if (result.PaymentOk)
@@ -54,9 +51,11 @@ namespace RecruitmentTest.Controllers
                 ViewData["Message"] = "Thank you. Your order has been placed.";
                 return View(result);
             }
-
-            return RedirectToAction("PaymentFailed");
-        }
+            else
+            {
+                return RedirectToAction("PaymentFailed");
+            }
+        }        
 
         public IActionResult Error()
         {

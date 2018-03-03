@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using RecruitmentTest.Controllers;
+using RecruitmentTest.Features;
 using RecruitmentTest.Tests.AutoFixture;
 using RecruitmentTest.Tests.Helpers;
 using Xunit;
@@ -61,7 +62,7 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public async Task Ordering_successfully_shows_thank_you_message(HomeController sut, RestaurantDbContext setupDb)
+        public async Task Ordering_successfully_shows_item_ordered_in_view(TestableHomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             await setupDb.EnsureSeededAsync();
@@ -73,28 +74,12 @@ namespace RecruitmentTest.Tests.Controllers
             // Then
             result
                 .Should().BeAssignableTo<ViewResult>()
-                .Which.ViewData.Should().Contain("Message", "Thank you. Your order has been placed.");
-        }
-
-        [Theory, DomainAutoData]
-        public async Task Ordering_successfully_shows_item_ordered_in_view(HomeController sut, RestaurantDbContext setupDb)
-        {
-            // Given
-            await setupDb.EnsureSeededAsync();
-            var orderItem = setupDb.MenuItems.First();
-
-            // When
-            var result = sut.Order(new OrderBuilder(orderItem).Build());
-
-            // Then
-            result
-                .Should().BeAssignableTo<ViewResult>()
-                .Which.Model.Should().BeAssignableTo<Features.Order.Result>()
+                .Which.Model.Should().BeAssignableTo<Features.OrderCommand.Result>()
                 .Which.Ordered.Should().BeEquivalentTo(orderItem);
         }
 
         [Theory, DomainAutoData]
-        public async Task Ordering_with_debit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
+        public async Task Ordering_with_debit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, TestableHomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             await setupDb.EnsureSeededAsync();
@@ -108,7 +93,7 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public async Task Ordering_with_credit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
+        public async Task Ordering_with_credit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, TestableHomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             await setupDb.EnsureSeededAsync();
@@ -122,7 +107,7 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public async Task Ordering_one_item_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext context)
+        public async Task Ordering_one_item_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, TestableHomeController sut, RestaurantDbContext context)
         {
             // Given
             await context.EnsureSeededAsync();
@@ -136,11 +121,11 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public async Task Ordering_multiple_items_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext context)
+        public async Task Ordering_multiple_items_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, TestableHomeController sut, RestaurantDbContext context)
         {
             // Given
             await context.EnsureSeededAsync();
-            var orderItems = context.MenuItems.Take(3);
+            var orderItems = context.MenuItems.Take(3).ToList();
             var totalPrice = orderItems.Aggregate(0m, (sum, item) => sum + item.Price);
 
             // When
@@ -148,6 +133,20 @@ namespace RecruitmentTest.Tests.Controllers
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<PaymentProvider>(), Arg.Any<int>(), totalPrice);
+        }
+
+        public class TestableHomeController : HomeController
+        {
+            private readonly Func<OrderCommand.Handler> orderHandlerFactory;
+
+            public TestableHomeController(RestaurantDbContext context, Func<OrderCommand.Handler> orderHandlerFactory)
+                : base(context)
+            {
+                this.orderHandlerFactory = orderHandlerFactory;
+            }
+
+            public ActionResult Order(OrderCommand order)
+                => base.Order(order, orderHandlerFactory());
         }
     }
 }

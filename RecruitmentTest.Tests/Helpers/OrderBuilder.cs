@@ -41,8 +41,8 @@ namespace RecruitmentTest.Tests.Helpers
             return this;
         }
 
-        internal Order Build() 
-            => new Order
+        internal OrderCommand Build() 
+            => new OrderCommand
             {
                 MenuItemId = MenuItems.Select(x => x.Id).ToArray(),
                 PaymentTypeId = PaymentTypeId,
