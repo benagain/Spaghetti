@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentTest.Models;
 
@@ -7,14 +8,15 @@ namespace RecruitmentTest.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly RestaurantDbContext context;
+
+        public HomeController(RestaurantDbContext context)
+        {
+            this.context = context;
+        }
         public IActionResult Index()
         {
-            List<MenuItem> menuItems = new List<MenuItem>();
-
-            //using (var context = new RestaurantDbContext())
-            //{
-            //    menuItems = context.MenuItems.ToList();
-            //}
+            List<MenuItem> menuItems = context.MenuItems.ToList();
 
             return View(menuItems);
         }

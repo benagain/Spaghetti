@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace RecruitmentTest
 {
     public class RestaurantDbContext : DbContext
     {
-        public RestaurantDbContext() 
+        public RestaurantDbContext(DbContextOptions options)
+            : base(options)
         {
-            Database.SetInitializer(new RestaurantDbInitializer());
-
-            this.Configuration.LazyLoadingEnabled = false;
-        } 
+        }
 
         public DbSet<MenuItem> MenuItems { get; set; }
-        public DbSet<MenuItemType> MenuItemTypes { get; set; }      
+
+        public DbSet<MenuItemType> MenuItemTypes { get; set; }
     }
 }
