@@ -11,9 +11,10 @@ using System;
 namespace RecruitmentTest.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    partial class RestaurantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180301160904_MenuItemsChildrenOfMenuItemTypes")]
+    partial class MenuItemsChildrenOfMenuItemTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,7 +55,7 @@ namespace RecruitmentTest.Migrations
                 {
                     b.HasOne("RecruitmentTest.MenuItemType")
                         .WithMany("Items")
-                        .HasForeignKey("MenuItemTypeId");
+                        .HasForeignKey("MenuItemTypeId"); 
                 });
 #pragma warning restore 612, 618
         }

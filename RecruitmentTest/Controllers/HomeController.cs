@@ -20,7 +20,7 @@ namespace RecruitmentTest.Controllers
         }
         public IActionResult Index()
         {
-            List<MenuItem> menuItems = context.MenuItems.ToList();
+            List<MenuItem> menuItems = context.MenuItemTypes.SelectMany(x => x.Items).ToList();
 
             return View(menuItems);
         }
