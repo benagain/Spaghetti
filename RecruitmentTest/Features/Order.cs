@@ -1,4 +1,7 @@
-﻿namespace RecruitmentTest.Features
+﻿using System;
+using System.Linq;
+
+namespace RecruitmentTest.Features
 {
     public class Order
     {
@@ -19,6 +22,10 @@
 
             public bool Handle(Order order)
             {
+                var item = context.MenuItems
+                    .SingleOrDefault(x => x.Id == order.MenuItemId)
+                    ?? throw new ArgumentException($"Menu item ${order.MenuItemId} not found");
+
                 PaymentProvider paymentProvider = null;
 
                 switch (order.PaymentTypeId)
@@ -34,7 +41,7 @@
 
                 if (paymentProvider != null)
                 {
-                    var paid = paymentGateway.Pay(paymentProvider, 1234, 1.0m);
+                    var paid = paymentGateway.Pay(paymentProvider, 1234, item.Price);
 
                     if (paid) return true;
                 }

@@ -106,5 +106,19 @@ namespace RecruitmentTest.Tests.Controllers
             // Then
             paymentGateway.Received().Pay(Arg.Any<CreditCard>(), Arg.Any<int>(), Arg.Any<decimal>());
         }
+
+        [Theory, DomainAutoData]
+        public async Task Ordering_takes_correct_payment_amount([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext context)
+        {
+            // Given
+            await context.EnsureSeededAsync();
+            var orderItem = context.MenuItems.First();
+
+            // When
+            sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = 1 });
+
+            // Then
+            paymentGateway.Received().Pay(Arg.Any<PaymentProvider>(), Arg.Any<int>(), orderItem.Price);
+        }
     }
 }
