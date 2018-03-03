@@ -33,7 +33,7 @@ namespace RecruitmentTest.Tests.Controllers
 
             var model = result
                 .Should().BeAssignableTo<ViewResult>()
-                .Which.Model.Should().BeAssignableTo<Behaviours.Order.Query>()
+                .Which.Model.Should().BeAssignableTo<Features.Menu>()
                 .Which.Courses.Should().BeEquivalentTo(courses);
         }
 

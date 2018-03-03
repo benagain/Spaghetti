@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RecruitmentTest.Behaviours;
+using RecruitmentTest.Features;
 using RecruitmentTest.Models;
 
 namespace RecruitmentTest.Controllers
@@ -19,10 +17,7 @@ namespace RecruitmentTest.Controllers
         }
         public IActionResult Index()
         {
-            var query = new Order.Query
-            {
-                Courses = context.MenuItemTypes.Include(p => p.Items),
-            };
+            var query = new Menu.Handler(context).Handle();
 
             return View(query);
         }
@@ -83,17 +78,6 @@ namespace RecruitmentTest.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
-}
-
-namespace RecruitmentTest.Behaviours
-{
-    public static class Order
-    {
-        public class Query
-        {
-            public IEnumerable<MenuItemType> Courses { get; set; }
         }
     }
 }
