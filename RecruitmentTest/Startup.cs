@@ -25,6 +25,7 @@ namespace RecruitmentTest
             services.AddMvc();
             services.AddDbContext<RestaurantDbContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("default")));
+            services.AddTransient<PaymentGateway, CardPaymentGateway>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

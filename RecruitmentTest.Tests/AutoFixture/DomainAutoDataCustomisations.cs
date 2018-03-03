@@ -8,7 +8,8 @@ namespace RecruitmentTest.Tests.AutoFixture
         public DomainAutoDataCustomisations()
             : base(
                   new AutoConfiguredNSubstituteCustomization(),
-                  new DatabaseCustomisation())
+                  new DatabaseCustomisation(),
+                  new PaymentCustomisation())
         {
         }
     }

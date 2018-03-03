@@ -1,5 +1,7 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.Xunit2;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using NSubstitute;
 using RecruitmentTest.Controllers;
 using RecruitmentTest.Tests.AutoFixture;
 using Xunit;
@@ -66,6 +68,19 @@ namespace RecruitmentTest.Tests.Controllers
             result
                 .Should().BeAssignableTo<RedirectToActionResult>()
                 .Which.ActionName.Should().Be(nameof(HomeController.PaymentOk));
+        }
+
+        [Theory, DomainAutoData]
+        public void Ordering_takes_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut)
+        {
+            // Given
+            const int creditCardPayment = 2;
+
+            // When
+            sut.Update(0, creditCardPayment);
+
+            // Then
+            paymentGateway.Received().Pay(Arg.Any<CreditCard>(), Arg.Any<int>(), Arg.Any<decimal>());
         }
     }
 }

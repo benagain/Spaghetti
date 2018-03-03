@@ -11,10 +11,12 @@ namespace RecruitmentTest.Controllers
     public class HomeController : Controller
     {
         private readonly RestaurantDbContext context;
+        private readonly PaymentGateway paymentGateway;
 
-        public HomeController(RestaurantDbContext context)
+        public HomeController(RestaurantDbContext context, PaymentGateway paymentGateway)
         {
             this.context = context;
+            this.paymentGateway = paymentGateway;
         }
         public IActionResult Index()
         {
@@ -54,8 +56,6 @@ namespace RecruitmentTest.Controllers
         public ActionResult Update(int menuItemId, int paymentTypeId)
         {
             PaymentProvider paymentProvider = null;
-
-            var paymentGateway = new PaymentGateway();
 
             switch (paymentTypeId)
             {

@@ -1,10 +1,7 @@
 ﻿namespace RecruitmentTest
 {
-    public class PaymentGateway
+    public interface PaymentGateway
     {
-        public bool Pay(PaymentProvider provider, int pin, decimal amount)
-        {
-            return true;
-        }
+        bool Pay(PaymentProvider provider, int pin, decimal amount);
     }
 }
