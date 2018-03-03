@@ -1,14 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace RecruitmentTest
 {
-    public class RestaurantDbInitializer : DropCreateDatabaseAlways<RestaurantDbContext>
+    public static class PrepareDatabaseExtensions
     {
-        protected override void Seed(RestaurantDbContext context)
+        public static async Task<IWebHost> PrepareDatabase(this IWebHost host)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var serviceProvider = scope.ServiceProvider;
+
+                try
+                {
+                    var context = serviceProvider.GetRequiredService<RestaurantDbContext>();
+                    await context.Database.MigrateAsync();
+                    await context.EnsureSeededAsync();
+                }
+                catch (Exception ex)
+                {
+                    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred seeding the DB.");
+                }
+            }
+            return host;
+        }
+
+        public static async Task<RestaurantDbContext> EnsureSeededAsync(this RestaurantDbContext context)
         {
             var menuItemTypes = new List<MenuItemType>();
 
@@ -16,8 +40,8 @@ namespace RecruitmentTest
             menuItemTypes.Add(new MenuItemType { Id = 2, Description = "Main" });
             menuItemTypes.Add(new MenuItemType { Id = 3, Description = "Desert" });
 
-            foreach (var menuItemType in menuItemTypes)
-                context.MenuItemTypes.Add(menuItemType);
+            var unseededMenuItemTypes = menuItemTypes.Except(context.MenuItemTypes);
+            await context.AddRangeAsync(unseededMenuItemTypes);
 
             var menuItems = new List<MenuItem>();
 
@@ -34,10 +58,12 @@ namespace RecruitmentTest
             menuItems.Add(new MenuItem { Id = 11, MenuItemTypeId = 3, Name = "Plum Tart", Price = 3.50m });
             menuItems.Add(new MenuItem { Id = 12, MenuItemTypeId = 3, Name = "Sorbet", Price = 1.99m });
 
-            foreach (var menuItem in menuItems)
-                context.MenuItems.Add(menuItem);
+            var unseededMenuItems = menuItems.Except(context.MenuItems);
+            await context.AddRangeAsync(unseededMenuItems);
 
-            base.Seed(context);
+            await context.SaveChangesAsync();
+
+            return context;
         }
     }
 }
