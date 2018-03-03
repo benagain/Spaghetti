@@ -7,11 +7,11 @@ namespace RecruitmentTest.Features
     {
         public IEnumerable<MenuItemType> Courses { get; set; }
 
-        public class Handler
+        public class QueryHandler
         {
             private readonly RestaurantDbContext context;
 
-            public Handler(RestaurantDbContext context)
+            public QueryHandler(RestaurantDbContext context)
             {
                 this.context = context;
             }

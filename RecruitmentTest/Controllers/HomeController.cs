@@ -17,7 +17,7 @@ namespace RecruitmentTest.Controllers
         }
         public IActionResult Index()
         {
-            var query = new Menu.Handler(context).Handle();
+            var query = new Menu.QueryHandler(context).Handle();
 
             return View(query);
         }
@@ -50,29 +50,15 @@ namespace RecruitmentTest.Controllers
             return View();
         }
 
-        public ActionResult Update(int menuItemId, int paymentTypeId)
+        public ActionResult Update(Order order)
         {
-            PaymentProvider paymentProvider = null;
+            var handler = new Order.CommandHandler(context, paymentGateway);
 
-            switch (paymentTypeId)
-            {
-                case 1:
-                    paymentProvider = new DebitCard("0123 4567 8910 1112");
-                    break;
+            var result = handler.Handle(order);
 
-                case 2:
-                    paymentProvider = new CreditCard("9999 9999 9999 9999");
-                    break;
-            }
-
-            if (paymentProvider != null)
-            {
-                var paid = paymentGateway.Pay(paymentProvider, 1234, 1.0m);
-
-                if (paid) return RedirectToAction("PaymentOk");
-            }
-
-            return RedirectToAction("PaymentFailed");
+            return result
+                ? RedirectToAction("PaymentOk")
+                : RedirectToAction("PaymentFailed");
         }
 
         public IActionResult Error()

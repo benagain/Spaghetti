@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -58,13 +59,15 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public void Pay_with_debit_card_redirects_to_PaymentOk(HomeController sut)
+        public async Task Pay_with_debit_card_redirects_to_PaymentOk(HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             const int debitCardPayment = 1;
+            await setupDb.EnsureSeededAsync();
+            var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Update(0, debitCardPayment);
+            var result = sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = debitCardPayment });
 
             // Then
             result
@@ -73,13 +76,15 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public void Pay_with_credit_card_redirects_to_PaymentOk(HomeController sut)
+        public async Task Pay_with_credit_card_redirects_to_PaymentOk(HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             const int creditCardPayment = 2;
+            await setupDb.EnsureSeededAsync();
+            var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Update(0, creditCardPayment);
+            var result = sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = creditCardPayment });
 
             // Then
             result
@@ -88,13 +93,15 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public void Ordering_takes_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut)
+        public async Task Ordering_takes_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             const int creditCardPayment = 2;
+            await setupDb.EnsureSeededAsync();
+            var orderItem = setupDb.MenuItems.First();
 
             // When
-            sut.Update(0, creditCardPayment);
+            var result = sut.Update(new Features.Order { MenuItemId = orderItem.Id, PaymentType = creditCardPayment });
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<CreditCard>(), Arg.Any<int>(), Arg.Any<decimal>());
