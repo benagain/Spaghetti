@@ -49,10 +49,10 @@ namespace RecruitmentTest.Controllers
 
             var result = handler.Handle(order);
 
-            if (result)
+            if (result.PaymentOk)
             {
                 ViewData["Message"] = "Thank you. Your order has been placed.";
-                return View(order);
+                return View(result);
             }
 
             return RedirectToAction("PaymentFailed");

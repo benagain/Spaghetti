@@ -9,6 +9,23 @@ namespace RecruitmentTest.Features
 
         public int PaymentTypeId { get; set; }
 
+        public class Result
+        {
+            public bool PaymentOk { get; private set; }
+
+            public MenuItem Ordered { get; private set; }
+
+            public static Result Success(MenuItem order) 
+                => new Result
+                {
+                    PaymentOk = true,
+                    Ordered = order,
+                };
+
+            public static Result Failed()
+                => new Result { PaymentOk = false };
+        }
+
         public class CommandHandler
         {
             private readonly RestaurantDbContext context;
@@ -20,7 +37,7 @@ namespace RecruitmentTest.Features
                 this.paymentGateway = paymentGateway;
             }
 
-            public bool Handle(Order order)
+            public Result Handle(Order order)
             {
                 var item = context.MenuItems
                     .SingleOrDefault(x => x.Id == order.MenuItemId)
@@ -43,10 +60,10 @@ namespace RecruitmentTest.Features
                 {
                     var paid = paymentGateway.Pay(paymentProvider, 1234, item.Price);
 
-                    if (paid) return true;
+                    if (paid) return Result.Success(item);
                 }
 
-                return false;
+                return Result.Failed();
             }
         }
     }

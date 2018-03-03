@@ -59,6 +59,23 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
+        public async Task Ordering_successfully_shows_thank_you_message(HomeController sut, RestaurantDbContext setupDb)
+        {
+            // Given
+            const int debitCardPayment = 1;
+            await setupDb.EnsureSeededAsync();
+            var orderItem = setupDb.MenuItems.First();
+
+            // When
+            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = debitCardPayment });
+
+            // Then
+            result
+                .Should().BeAssignableTo<ViewResult>()
+                .Which.ViewData.Should().Contain("Message", "Thank you. Your order has been placed.");
+        }
+
+        [Theory, DomainAutoData]
         public async Task Ordering_successfully_shows_item_ordered_in_view(HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
@@ -72,11 +89,27 @@ namespace RecruitmentTest.Tests.Controllers
             // Then
             result
                 .Should().BeAssignableTo<ViewResult>()
-                .Which.ViewData.Should().Contain("Message", "Thank you. Your order has been placed.");
+                .Which.Model.Should().BeAssignableTo<Features.Order.Result>()
+                .Which.Ordered.Should().BeEquivalentTo(orderItem);
         }
 
         [Theory, DomainAutoData]
-        public async Task Ordering_takes_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
+        public async Task Ordering_with_debit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
+        {
+            // Given
+            const int debitCardPayment = 1;
+            await setupDb.EnsureSeededAsync();
+            var orderItem = setupDb.MenuItems.First();
+
+            // When
+            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = debitCardPayment });
+
+            // Then
+            paymentGateway.Received().Pay(Arg.Any<DebitCard>(), Arg.Any<int>(), Arg.Any<decimal>());
+        }
+
+        [Theory, DomainAutoData]
+        public async Task Ordering_with_credit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
             const int creditCardPayment = 2;
