@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using FluentAssertions;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using RecruitmentTest.Controllers;
 using RecruitmentTest.Tests.AutoFixture;
+using RecruitmentTest.Tests.Helpers;
 using Xunit;
 
 namespace RecruitmentTest.Tests.Controllers
@@ -62,12 +64,11 @@ namespace RecruitmentTest.Tests.Controllers
         public async Task Ordering_successfully_shows_thank_you_message(HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
-            const int debitCardPayment = 1;
             await setupDb.EnsureSeededAsync();
             var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = debitCardPayment });
+            var result = sut.Order(new OrderBuilder(orderItem).Build());
 
             // Then
             result
@@ -79,12 +80,11 @@ namespace RecruitmentTest.Tests.Controllers
         public async Task Ordering_successfully_shows_item_ordered_in_view(HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
-            const int creditCardPayment = 2;
             await setupDb.EnsureSeededAsync();
             var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = creditCardPayment });
+            var result = sut.Order(new OrderBuilder(orderItem).Build());
 
             // Then
             result
@@ -97,12 +97,11 @@ namespace RecruitmentTest.Tests.Controllers
         public async Task Ordering_with_debit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
-            const int debitCardPayment = 1;
             await setupDb.EnsureSeededAsync();
             var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = debitCardPayment });
+            var result = sut.Order(new OrderBuilder(orderItem).WithDebitCard().Build());
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<DebitCard>(), Arg.Any<int>(), Arg.Any<decimal>());
@@ -112,12 +111,11 @@ namespace RecruitmentTest.Tests.Controllers
         public async Task Ordering_with_credit_card_payment_through_PaymentGateway([Frozen] PaymentGateway paymentGateway, HomeController sut, RestaurantDbContext setupDb)
         {
             // Given
-            const int creditCardPayment = 2;
             await setupDb.EnsureSeededAsync();
             var orderItem = setupDb.MenuItems.First();
 
             // When
-            var result = sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = creditCardPayment });
+            var result = sut.Order(new OrderBuilder(orderItem).WithCreditCard().Build());
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<CreditCard>(), Arg.Any<int>(), Arg.Any<decimal>());
@@ -131,7 +129,7 @@ namespace RecruitmentTest.Tests.Controllers
             var orderItem = context.MenuItems.First();
 
             // When
-            sut.Order(new Features.Order { MenuItemId = orderItem.Id, PaymentTypeId = 1 });
+            var result = sut.Order(new OrderBuilder(orderItem).Build());
 
             // Then
             paymentGateway.Received().Pay(Arg.Any<PaymentProvider>(), Arg.Any<int>(), orderItem.Price);
