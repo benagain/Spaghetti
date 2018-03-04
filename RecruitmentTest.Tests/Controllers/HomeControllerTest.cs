@@ -16,7 +16,7 @@ namespace RecruitmentTest.Tests.Controllers
     public class HomeControllerTest
     {
         [Theory, DomainAutoData]
-        public void Index(HomeController sut)
+        public void Index(TestableHomeController sut)
         {
             // Act
             var result = sut.Index() as ViewResult;
@@ -26,7 +26,7 @@ namespace RecruitmentTest.Tests.Controllers
         }
 
         [Theory, DomainAutoData]
-        public async Task Index_returns_all_menu_items_grouped_by_course(HomeController sut, RestaurantDbContext setupDb, MenuItemType[] courses)
+        public async Task Index_returns_all_menu_items_grouped_by_course(TestableHomeController sut, RestaurantDbContext setupDb, MenuItemType[] courses)
         {
             // Given
             await setupDb.MenuItemTypes.AddRangeAsync(courses);
@@ -137,13 +137,21 @@ namespace RecruitmentTest.Tests.Controllers
 
         public class TestableHomeController : HomeController
         {
+            private readonly Func<MenuQueryHandler> menuHandlerFactory;
             private readonly Func<OrderCommandHandler> orderHandlerFactory;
 
-            public TestableHomeController(RestaurantDbContext context, Func<OrderCommandHandler> orderHandlerFactory)
+            public TestableHomeController(
+                RestaurantDbContext context, 
+                Func<MenuQueryHandler> menuHandlerFactory,
+                Func<OrderCommandHandler> orderHandlerFactory)
                 : base(context)
             {
+                this.menuHandlerFactory = menuHandlerFactory;
                 this.orderHandlerFactory = orderHandlerFactory;
             }
+
+            public IActionResult Index()
+                => base.Index(menuHandlerFactory());
 
             public ActionResult Order(OrderCommand order)
                 => base.Order(order, orderHandlerFactory());
