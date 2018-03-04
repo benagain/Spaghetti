@@ -74,7 +74,7 @@ namespace RecruitmentTest.Tests.Controllers
             // Then
             result
                 .Should().BeAssignableTo<ViewResult>()
-                .Which.Model.Should().BeAssignableTo<Features.OrderCommand.Result>()
+                .Which.Model.Should().BeAssignableTo<OrderCommandResult>()
                 .Which.Ordered.Should().BeEquivalentTo(orderItem);
         }
 
@@ -137,9 +137,9 @@ namespace RecruitmentTest.Tests.Controllers
 
         public class TestableHomeController : HomeController
         {
-            private readonly Func<OrderCommand.Handler> orderHandlerFactory;
+            private readonly Func<OrderCommandHandler> orderHandlerFactory;
 
-            public TestableHomeController(RestaurantDbContext context, Func<OrderCommand.Handler> orderHandlerFactory)
+            public TestableHomeController(RestaurantDbContext context, Func<OrderCommandHandler> orderHandlerFactory)
                 : base(context)
             {
                 this.orderHandlerFactory = orderHandlerFactory;

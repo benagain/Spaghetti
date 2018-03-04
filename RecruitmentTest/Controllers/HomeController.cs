@@ -42,7 +42,7 @@ namespace RecruitmentTest.Controllers
             return View();
         }
 
-        public ActionResult Order(OrderCommand order, [FromServices] OrderCommand.Handler handler)
+        public ActionResult Order(OrderCommand order, [FromServices] OrderCommandHandler handler)
         {
             var result = handler.Handle(order);
 
