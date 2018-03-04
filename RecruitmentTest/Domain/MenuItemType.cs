@@ -15,9 +15,9 @@ namespace RecruitmentTest
             _Items = items.ToList();
         }
 
-        public int Id { get; set; }
+        public int Id { get; private set; }
 
-        public string Description { get; set; }
+        public string Description { get; private set; }
 
         private List<MenuItem> _Items { get; set; } = new List<MenuItem>();
 

@@ -39,30 +39,30 @@ namespace RecruitmentTest
                 "Starter",
                 new[]
                 {
-                    new MenuItem { Name = "Arancini", Price = 2.29m },
-                    new MenuItem { Name = "Fonduta Formaggi", Price = 3.79m },
-                    new MenuItem { Name = "Bruschetta", Price = 3.29m },
-                    new MenuItem { Name = "Mixed Olives", Price = 2.75m },
-                    new MenuItem { Name = "N'Duja Pizzette", Price = 3.10m },
+                    new MenuItem ( name: "Arancini", price: 2.29m ),
+                    new MenuItem ( name: "Fonduta Formaggi", price: 3.79m ),
+                    new MenuItem ( name: "Bruschetta", price: 3.29m ),
+                    new MenuItem ( name: "Mixed Olives", price: 2.75m ),
+                    new MenuItem ( name: "N'Duja Pizzette", price: 3.10m ),
                 }),
 
                 new MenuItemType(
                 "Main",
                 new[]
                 {
-                    new MenuItem { Name = "Spaghetti Bolognese", Price = 6.75m },
-                    new MenuItem { Name = "Cheeseburger", Price = 6.99m },
-                    new MenuItem { Name = "Lasagne", Price = 5.99m },
-                    new MenuItem { Name = "Lobster and Crab Tortelli", Price = 14.99m },
+                    new MenuItem ( name: "Spaghetti Bolognese", price: 6.75m ),
+                    new MenuItem ( name: "Cheeseburger", price: 6.99m ),
+                    new MenuItem ( name: "Lasagne", price: 5.99m ),
+                    new MenuItem ( name: "Lobster and Crab Tortelli", price: 14.99m ),
                 }),
 
                 new MenuItemType(
                 "Desert",
                 new[]
                 {
-                    new MenuItem { Name = "Tiramisu", Price = 4.50m },
-                    new MenuItem { Name = "Plum Tart", Price = 3.50m },
-                    new MenuItem { Name = "Sorbet", Price = 1.99m }
+                    new MenuItem ( name: "Tiramisu", price: 4.50m ),
+                    new MenuItem ( name: "Plum Tart", price: 3.50m ),
+                    new MenuItem ( name: "Sorbet", price: 1.99m ),
                 })
             };
 
