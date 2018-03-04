@@ -58,10 +58,10 @@ namespace RecruitmentTest.Features
             private bool TakePayment(OrderCommand order, decimal price)
             {
                 var paymentProvider = paymentProviders.Create(order.PaymentTypeId);
-                
-                if (paymentProvider == null) return false;
 
-                return paymentGateway.Pay(paymentProvider, 1234, price);
+                return paymentProvider
+                    .Map(provider => paymentGateway.Pay(provider, 1234, price))
+                    .IfNone(false);
             }
         }
     }
