@@ -1,4 +1,4 @@
-﻿@model RecruitmentTest.Features.Menu
+﻿@model RecruitmentTest.Features.OrderCommand
 
 @{
     ViewBag.Title = "Home Page";
@@ -22,14 +22,14 @@
             <ul>
             @foreach (var menuItem in course.Items)
             {
-                <li>@menuItem.Name : £ @menuItem.Price <input type="checkbox" name="menuItemId" value="@menuItem.Id" /></li>
+                <li>@menuItem.Name : £ @menuItem.Price <input type="checkbox" name="@nameof(Model.OrderedDishes)" value="@menuItem.Id" /></li>
             }
             </ul>
         }
         <h2>Payment Type</h2>
         <ul>
-            <li>Debit card <input type="radio" name="paymentTypeId" value="1" /></li>
-            <li>Credit card <input type="radio" name="paymentTypeId" value="2" /></li>
+            <li>Debit card @Html.RadioButtonFor(model => model.PaymentTypeId, 1)</li>
+            <li>Credit card @Html.RadioButtonFor(model => model.PaymentTypeId, 2)</li>
         </ul>
         <input type="submit" value="Order" />
     </div>

@@ -14,7 +14,7 @@ namespace RecruitmentTest.Controllers
             this.context = context;
         }
 
-        public IActionResult Index([FromServices] MenuQueryHandler handler)
+        public IActionResult Index([FromServices] OrderQueryHandler handler)
         {
             var query = handler.Handle();
 

@@ -44,7 +44,7 @@ namespace RecruitmentTest.Tests.Helpers
         internal OrderCommand Build() 
             => new OrderCommand
             {
-                MenuItemId = MenuItems.Select(x => x.Id).ToArray(),
+                OrderedDishes = MenuItems.Select(x => x.Id).ToArray(),
                 PaymentTypeId = PaymentTypeId,
             };
     }

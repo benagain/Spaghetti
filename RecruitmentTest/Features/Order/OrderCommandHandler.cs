@@ -30,7 +30,7 @@ namespace RecruitmentTest.Features
         }
 
         private IEnumerable<MenuItem> FindOrderedItems(OrderCommand order)
-            => context.MenuItems.Where(x => order.MenuItemId.Contains(x.Id));
+            => context.MenuItems.Where(x => order.OrderedDishes.Contains(x.Id));
 
         private bool TakePayment(OrderCommand order, decimal price)
         {

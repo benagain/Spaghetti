@@ -37,7 +37,7 @@ namespace RecruitmentTest.Tests.Controllers
 
             var model = result
                 .Should().BeAssignableTo<ViewResult>()
-                .Which.Model.Should().BeAssignableTo<Features.Menu>()
+                .Which.Model.Should().BeAssignableTo<Features.OrderCommand>()
                 .Which.Courses.Should().BeEquivalentTo(courses);
         }
 
@@ -137,12 +137,12 @@ namespace RecruitmentTest.Tests.Controllers
 
         public class TestableHomeController : HomeController
         {
-            private readonly Func<MenuQueryHandler> menuHandlerFactory;
+            private readonly Func<OrderQueryHandler> menuHandlerFactory;
             private readonly Func<OrderCommandHandler> orderHandlerFactory;
 
             public TestableHomeController(
                 RestaurantDbContext context, 
-                Func<MenuQueryHandler> menuHandlerFactory,
+                Func<OrderQueryHandler> menuHandlerFactory,
                 Func<OrderCommandHandler> orderHandlerFactory)
                 : base(context)
             {
