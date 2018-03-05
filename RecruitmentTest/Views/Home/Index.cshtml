@@ -16,15 +16,15 @@
         <div class="col-md-4">
             <h2>Menu</h2>
 
-            @foreach (var newCourses in Model.NewCourses)
             @{ var index = 0; }
+            @foreach (var courses in Model.Courses)
             {
-                <h3>@newCourses.Name</h3>
+                <h3>@courses.Name</h3>
 
                 <ul>
-                    @foreach (var dishes in newCourses.Dishes)
+                    @foreach (var dishes in courses.Dishes)
                     {
-                        var inputName = $"{nameof(Model.NewCourses)}[0].{nameof(newCourses.Dishes)}[{index++}]";
+                        var inputName = $"{nameof(Model.Courses)}[0].{nameof(courses.Dishes)}[{index++}]";
                         <li>
                             @dishes.Name : £ @dishes.Price
                             <input type="hidden" name="@($"{inputName}.Id")" value="@dishes.Id" />

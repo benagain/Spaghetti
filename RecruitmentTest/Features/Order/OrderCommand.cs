@@ -16,29 +16,15 @@ namespace RecruitmentTest.Features
         {
         }
 
-        public OrderCommand(IEnumerable<MenuItemType> courses)
+        public OrderCommand(Course[] courses)
         {
             Courses = courses;
-            NewCourses = courses.Select(
-                course => new Course
-                {
-                    Name = course.Description,
-                    Dishes = course.Items.Select(
-                        dish => new Dish
-                        {
-                            Id = dish.Id,
-                            Name = dish.Name,
-                            Price = dish.Price
-                        }).ToArray()
-                }).ToArray();
         }
 
-        public IEnumerable<MenuItemType> Courses { get; }
-
-        public Course[] NewCourses { get; set; }
+        public Course[] Courses { get; set; }
 
         public int[] OrderedDishes
-            => NewCourses
+            => Courses
                 .SelectMany(course => 
                     course.Dishes
                         .Where(dish => dish.Ordered)
@@ -53,11 +39,6 @@ namespace RecruitmentTest.Features
         public string Name { get; set; }
 
         public Dish[] Dishes { get; set; }
-
-        internal static Course[] Select()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class Dish

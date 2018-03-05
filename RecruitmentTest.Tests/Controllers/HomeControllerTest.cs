@@ -29,6 +29,20 @@ namespace RecruitmentTest.Tests.Controllers
         public async Task Index_returns_all_menu_items_grouped_by_course(TestableHomeController sut, RestaurantDbContext setupDb, MenuItemType[] courses)
         {
             // Given
+            var expected = courses.Select(
+                c => new Course
+                {
+                    Name = c.Description,
+                    Dishes = c.Items.Select(
+                        i => new Dish
+                        {
+                            Id = i.Id,
+                            Name = i.Name,
+                            Price = i.Price,
+                            Ordered = false,
+                        }).ToArray(),
+                });
+
             await setupDb.MenuItemTypes.AddRangeAsync(courses);
             await setupDb.SaveChangesAsync();
 
@@ -38,7 +52,7 @@ namespace RecruitmentTest.Tests.Controllers
             var model = result
                 .Should().BeAssignableTo<ViewResult>()
                 .Which.Model.Should().BeAssignableTo<Features.OrderCommand>()
-                .Which.Courses.Should().BeEquivalentTo(courses);
+                .Which.Courses.Should().BeEquivalentTo(expected);
         }
 
         [Theory, DomainAutoData]
