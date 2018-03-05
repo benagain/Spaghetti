@@ -13,25 +13,32 @@
 <div class="row">
     @using (Html.BeginForm(nameof(RecruitmentTest.Controllers.HomeController.Order), "Home", FormMethod.Post))
     {
-    <div class="col-md-4">
-        <h2>Menu</h2>
-        @foreach (var course in Model.Courses)
-        {
-            <h3>@course.Description</h3>
+        <div class="col-md-4">
+            <h2>Menu</h2>
 
-            <ul>
-            @foreach (var menuItem in course.Items)
+            @foreach (var newCourses in Model.NewCourses)
+            @{ var index = 0; }
             {
-                <li>@menuItem.Name : £ @menuItem.Price <input type="checkbox" name="@nameof(Model.OrderedDishes)" value="@menuItem.Id" /></li>
+                <h3>@newCourses.Name</h3>
+
+                <ul>
+                    @foreach (var dishes in newCourses.Dishes)
+                    {
+                        var inputName = $"{nameof(Model.NewCourses)}[0].{nameof(newCourses.Dishes)}[{index++}]";
+                        <li>
+                            @dishes.Name : £ @dishes.Price
+                            <input type="hidden" name="@($"{inputName}.Id")" value="@dishes.Id" />
+                            <input type="checkbox" name="@($"{inputName}.Ordered")" value="true" />
+                        </li>
+                    }
+                </ul>
             }
+            <h2>Payment Type</h2>
+            <ul>
+                <li>Debit card @Html.RadioButtonFor(model => model.PaymentTypeId, 1)</li>
+                <li>Credit card @Html.RadioButtonFor(model => model.PaymentTypeId, 2)</li>
             </ul>
-        }
-        <h2>Payment Type</h2>
-        <ul>
-            <li>Debit card @Html.RadioButtonFor(model => model.PaymentTypeId, 1)</li>
-            <li>Credit card @Html.RadioButtonFor(model => model.PaymentTypeId, 2)</li>
-        </ul>
-        <input type="submit" value="Order" />
-    </div>
+            <input type="submit" value="Order" />
+        </div>
     }
 </div>
